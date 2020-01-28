@@ -17,8 +17,8 @@ import Language.Haskell.TH hiding (cxt)
 import Language.Haskell.TH.Syntax (VarBangType)
 import Data.String
 import Data.Foldable (foldl')
-import Data.Barbie
-import Data.Barbie.Bare
+import Data.Functor.Barbie
+import Barbies.Bare
 import Data.Functor.Product
 import GHC.Generics (Generic)
 import Control.Applicative
@@ -31,7 +31,7 @@ class FieldNamesB b where
 
 -- | Transform a regular Haskell record declaration into HKD form.
 -- 'BareB', 'FieldNamesB', 'FunctorB', 'TraversableB', 'ProductB',
--- 'ConstraintsB' and 'ProductBC' instances are derived.
+-- and 'ConstraintsB' instances are derived.
 --
 -- For example,
 --
@@ -84,8 +84,7 @@ declareBareB decsQ = do
             )
           {-# INLINE btraverse #-}
         instance ConstraintsB $(datC)
-        instance ProductBC $(datC)
-        instance ProductB $(datC) where
+        instance ApplicativeB $(datC) where
           bprod $(conP conName $ map varP xs) $(conP conName $ map varP ys) = $(foldl'
             (\r (x, y) -> [|$(r) (Pair $(varE x) $(varE y))|])
             (conE conName) (zip xs ys))
